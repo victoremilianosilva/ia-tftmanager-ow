@@ -7,6 +7,9 @@ from live_inference.gep_snapshot import GepSnapshot, SnapshotSequence, SnapshotV
 def canonical_state():
     unknown = {"known": False, "value": None}
     empty_slots = {"known": True, "slots": [{"known": True, "unit": None} for _ in range(28)]}
+    empty_slots["slots"][0]["unit"] = {
+        "apiName": "TFT_Test", "star": {"known": True, "value": 2}, "items": ["DA_InfinityEdge"]
+    }
     bench_slots = {"known": True, "slots": [{"known": True, "unit": None} for _ in range(9)]}
     shop_slots = {"known": True, "slots": [{"known": True, "value": None} for _ in range(5)]}
     player = {

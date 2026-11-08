@@ -19,7 +19,7 @@ void validate_unit_slots(const Observed<Slots>& observed, const char* name,
         if (!slot.known || !slot.value.has_value()) continue;
         const auto& unit = *slot.value;
         if (unit.champion_api_name.empty()) errors.emplace_back(std::string(name) + " has an empty champion API name");
-        if (unit.star < 1 || unit.star > 3) errors.emplace_back(std::string(name) + " has an invalid star level");
+        validate_observed(unit.star, "unit.star", [](std::int32_t v) { return v >= 1 && v <= 3; }, errors);
         for (const auto& item : unit.item_ids) if (item.empty()) errors.emplace_back(std::string(name) + " has an empty item API name");
     }
 }

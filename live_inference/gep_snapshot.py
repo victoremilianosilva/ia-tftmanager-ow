@@ -57,8 +57,7 @@ def _validate_unit(value: Any, name: str) -> None:
     unit = _mapping(value, name)
     if not _text(unit.get("apiName")):
         raise SnapshotValidationError(f"{name}.apiName must be a non-empty string")
-    if type(unit.get("star")) is not int or not 1 <= unit["star"] <= 3:
-        raise SnapshotValidationError(f"{name}.star must be between 1 and 3")
+    _known(unit.get("star"), f"{name}.star", lambda x: type(x) is int and 1 <= x <= 3)
     items = unit.get("items")
     if not isinstance(items, list) or any(not _text(item) for item in items):
         raise SnapshotValidationError(f"{name}.items must be an array of item API names")

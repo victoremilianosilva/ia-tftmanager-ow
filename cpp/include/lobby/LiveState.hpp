@@ -25,7 +25,7 @@ struct Observed {
 
 struct UnitState {
     std::string champion_api_name;
-    std::int32_t star{1};
+    Observed<std::int32_t> star;
     std::vector<std::string> item_ids;
 };
 using UnitSlot = Observed<std::optional<UnitState>>;
