@@ -99,7 +99,14 @@ def _validate_shop(value: Any, name: str) -> None:
     if not isinstance(slots, list) or len(slots) != 5:
         raise SnapshotValidationError(f"{name}.slots must contain exactly 5 slots")
     for index, raw in enumerate(slots):
-        _known(raw, f"{name}.slots[{index}]", lambda x: _text(x))
+        slot = _mapping(raw, f"{name}.slots[{index}]")
+        if type(slot.get("known")) is not bool:
+            raise SnapshotValidationError(f"{name}.slots[{index}].known must be a boolean")
+        offer = slot.get("value")
+        if not slot["known"] and offer is not None:
+            raise SnapshotValidationError(f"{name}.slots[{index}] unknown value must be null")
+        if slot["known"] and offer is not None and not _text(offer):
+            raise SnapshotValidationError(f"{name}.slots[{index}] offer must be a champion API name or null")
 
 
 def _validate_state(value: Any) -> None:
@@ -241,6 +248,10 @@ class SnapshotSequence:
         if not snapshot.complete:
             self._ready = False
             return SnapshotDecision("awaiting_baseline", snapshot, False)
+        local = snapshot.state["localPlayerIndex"]
+        if not local["known"] or snapshot.state["players"][local["value"]] is None:
+            self._ready = False
+            return SnapshotDecision("awaiting_local_player", snapshot, False)
         self._ready = True
         return SnapshotDecision("ready", snapshot, True)
 

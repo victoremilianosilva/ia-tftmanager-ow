@@ -99,6 +99,14 @@ class CanonicalSnapshotTests(unittest.TestCase):
         self.assertEqual(ready.status, "ready")
         self.assertTrue(ready.ready_for_inference)
 
+    def test_sequence_waits_for_local_player_mapping(self):
+        state = canonical_state()
+        state["localPlayerIndex"] = {"known": False, "value": None}
+        state["players"] = [None] * 8
+        decision = SnapshotSequence().ingest(snapshot(state=state))
+        self.assertEqual(decision.status, "awaiting_local_player")
+        self.assertFalse(decision.ready_for_inference)
+
     def test_sequence_ignores_duplicates_and_stale_revisions(self):
         sequence = SnapshotSequence()
         sequence.ingest(snapshot(revision=5))
