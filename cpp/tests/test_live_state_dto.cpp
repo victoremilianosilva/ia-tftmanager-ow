@@ -21,7 +21,7 @@ int main() {
     player.xp = Observed<std::int32_t>::of(12);
     player.alive = Observed<bool>::of(true);
     player.board[0] = UnitSlot::of(UnitState{"TFT18_Test", 2, std::nullopt, {}});
-    player.bench[0] = UnitSlot::of(std::nullopt); // Known empty is not unknown.
+    player.bench[0] = UnitSlot::of(std::optional<UnitState>{}); // Known empty is not unknown.
     state.players[0] = player;
 
     auto report = validate_match_state(state);
