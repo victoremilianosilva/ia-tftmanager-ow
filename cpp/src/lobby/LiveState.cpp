@@ -31,6 +31,7 @@ ValidationReport validate_match_state(const MatchState& state) {
     if (state.contract_version != 1) report.errors.emplace_back("unsupported canonical state contract version");
     if (state.game_id == 0) report.errors.emplace_back("game_id must be positive");
     if (!state.complete) report.errors.emplace_back("baseline is incomplete");
+    validate_observed(state.match_id, "match_id", [](const std::string& v) { return !v.empty(); }, report.errors);
     validate_observed(state.stage, "stage", [](std::uint32_t v) { return v > 0; }, report.errors);
     validate_observed(state.round, "round", [](std::uint32_t v) { return v > 0; }, report.errors);
     validate_observed(state.phase, "phase", [](const std::string& v) { return !v.empty(); }, report.errors);
@@ -45,6 +46,9 @@ ValidationReport validate_match_state(const MatchState& state) {
         }
         const auto& player = *state.players[index];
         if (player.player_id != static_cast<std::int32_t>(index)) report.errors.emplace_back("player index does not match canonical array position");
+        if (player.local_player && (!state.local_player_index.known ||
+            state.local_player_index.value != player.player_id))
+            report.errors.emplace_back("local player flag disagrees with local_player_index");
         if (!ids.insert(player.player_id).second) report.errors.emplace_back("duplicate player index");
         validate_observed(player.hp, "player.hp", [](float v) { return std::isfinite(v) && v >= 0.0f && v <= 100.0f; }, report.errors);
         validate_observed(player.gold, "player.gold", [](std::int32_t v) { return v >= 0; }, report.errors);
@@ -52,6 +56,12 @@ ValidationReport validate_match_state(const MatchState& state) {
         validate_observed(player.xp, "player.xp", [](std::int32_t v) { return v >= 0; }, report.errors);
         validate_unit_slots(player.board, "board", report.errors);
         validate_unit_slots(player.bench, "bench", report.errors);
+        if (player.shop.known) {
+            for (const auto& offer : player.shop.value) {
+                if (offer.known && offer.value && offer.value->empty())
+                    report.errors.emplace_back("shop contains an empty champion API name");
+            }
+        }
         if (player.item_components.known) {
             for (const auto& item : player.item_components.value) {
                 if (item.api_name.empty() || item.count <= 0) report.errors.emplace_back("invalid component stack");
