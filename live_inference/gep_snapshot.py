@@ -15,7 +15,7 @@ class SnapshotValidationError(ValueError):
     """Raised when a canonical TFT snapshot violates its transport contract."""
 
 
-_REQUIRED_FIELDS = {"schemaVersion", "gameId", "revision", "capturedAt", "complete", "state"}
+_REQUIRED_FIELDS = {"schemaVersion", "gameId", "sessionId", "revision", "capturedAt", "complete", "state"}
 _FORBIDDEN_KEYS = {
     "token", "credentials", "lcuinfo", "puuid", "accountid", "summonerid",
     "playerpuuid", "riotid", "platformid",
@@ -164,6 +164,7 @@ def _validate_state(value: Any) -> None:
 class GepSnapshot:
     schema_version: int
     game_id: int
+    session_id: str
     revision: int
     captured_at: str
     complete: bool
@@ -177,12 +178,15 @@ class GepSnapshot:
         if missing:
             raise SnapshotValidationError("snapshot is missing required fields: " + ", ".join(sorted(missing)))
         schema_version, game_id = payload["schemaVersion"], payload["gameId"]
+        session_id = payload["sessionId"]
         revision, complete, captured_at = payload["revision"], payload["complete"], payload["capturedAt"]
         state = payload["state"]
         if type(schema_version) is not int or schema_version != 2:
             raise SnapshotValidationError("unsupported schemaVersion; expected integer 2")
         if type(game_id) is not int or game_id <= 0:
             raise SnapshotValidationError("gameId must be a positive integer")
+        if not isinstance(session_id, str) or not session_id.strip():
+            raise SnapshotValidationError("sessionId must be a non-empty string")
         if type(revision) is not int or revision < 0:
             raise SnapshotValidationError("revision must be a non-negative integer")
         if type(complete) is not bool:
@@ -201,7 +205,7 @@ class GepSnapshot:
             raise SnapshotValidationError("snapshot must contain finite JSON values only") from exc
         if len(encoded) > max_bytes:
             raise SnapshotValidationError(f"snapshot exceeds the configured {max_bytes}-byte limit")
-        return cls(schema_version, game_id, revision, captured_at, complete, dict(state))
+        return cls(schema_version, game_id, session_id, revision, captured_at, complete, dict(state))
 
 
 def _reject_sensitive_keys(value: Any, *, depth: int = 0) -> None:
@@ -231,13 +235,14 @@ class SnapshotSequence:
     """Tracks one game session and rejects stale/incomplete canonical snapshots."""
     def __init__(self) -> None:
         self._game_id: int | None = None
+        self._session_id: str | None = None
         self._revision: int | None = None
         self._ready = False
 
     def ingest(self, payload: Any) -> SnapshotDecision:
         snapshot = GepSnapshot.parse(payload)
-        if self._game_id != snapshot.game_id:
-            self._game_id, self._revision, self._ready = snapshot.game_id, None, False
+        if self._game_id != snapshot.game_id or self._session_id != snapshot.session_id:
+            self._game_id, self._session_id, self._revision, self._ready = snapshot.game_id, snapshot.session_id, None, False
         if self._revision is not None:
             if snapshot.revision < self._revision:
                 return SnapshotDecision("stale", snapshot, False)
@@ -256,5 +261,6 @@ class SnapshotSequence:
 
     def reset(self) -> None:
         self._game_id = None
+        self._session_id = None
         self._revision = None
         self._ready = False

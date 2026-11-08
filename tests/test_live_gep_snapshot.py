@@ -31,7 +31,7 @@ def canonical_state():
 
 def snapshot(**overrides):
     value = {
-        "schemaVersion": 2, "gameId": 109, "revision": 1,
+        "schemaVersion": 2, "gameId": 109, "sessionId": "tft-session-a", "revision": 1,
         "capturedAt": "2026-11-08T16:00:00.000Z", "complete": True,
         "state": canonical_state(),
     }
@@ -110,6 +110,13 @@ class CanonicalSnapshotTests(unittest.TestCase):
         self.assertEqual(decision.status, "awaiting_local_player")
         self.assertFalse(decision.ready_for_inference)
 
+    def test_new_match_session_resets_revision_even_when_gep_game_id_is_constant(self):
+        sequence = SnapshotSequence()
+        sequence.ingest(snapshot(revision=12))
+        next_match = sequence.ingest(snapshot(sessionId="tft-session-b", revision=1))
+        self.assertEqual(next_match.status, "ready")
+        self.assertTrue(next_match.ready_for_inference)
+
     def test_sequence_ignores_duplicates_and_stale_revisions(self):
         sequence = SnapshotSequence()
         sequence.ingest(snapshot(revision=5))
@@ -119,7 +126,7 @@ class CanonicalSnapshotTests(unittest.TestCase):
     def test_new_game_starts_a_new_revision_sequence(self):
         sequence = SnapshotSequence()
         sequence.ingest(snapshot(revision=12))
-        next_game = sequence.ingest(snapshot(gameId=110, revision=0, complete=False))
+        next_game = sequence.ingest(snapshot(gameId=109, sessionId="tft-session-b", revision=0, complete=False))
         self.assertEqual(next_game.status, "awaiting_baseline")
         self.assertFalse(next_game.ready_for_inference)
 

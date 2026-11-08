@@ -5,7 +5,7 @@
 int main() {
     using namespace tft::live;
     MatchState state;
-    state.game_id = 42; state.revision = 7; state.complete = true;
+    state.game_id = 42; state.session_id = "session-a"; state.revision = 7; state.complete = true;
     state.stage = Observed<std::uint32_t>::of(2);
     state.round = Observed<std::uint32_t>::of(3);
     state.local_player_index = Observed<std::int32_t>::of(0);

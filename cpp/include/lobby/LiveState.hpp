@@ -53,7 +53,7 @@ struct PlayerState {
 struct MatchState {
     std::uint32_t schema_version{2}; // transport envelope schemaVersion
     std::uint32_t contract_version{1}; // state.contractVersion
-    std::uint64_t game_id{0};
+    std::uint64_t game_id{0};\n    std::string session_id;
     std::uint64_t revision{0};
     bool complete{false};
     Observed<std::uint32_t> stage;

@@ -9,7 +9,7 @@ contain mappings for `me.me.gold`, `board.board_pieces`, `cell_N`, or other GEP 
 
 ## Transport schema v2
 
-Envelope: `schemaVersion=2`, `gameId`, `revision`, `capturedAt`, `complete`,
+Envelope: `schemaVersion=2`, `gameId`, `sessionId`, `revision`, `capturedAt`, `complete`,
 and `state`. The state declares `contract="tft.live-state"` and
 `contractVersion=1`.
 
