@@ -1,68 +1,47 @@
-# GEP snapshot contract and mapping status
+# Canonical Overwolf live-state contract
 
-## Transport envelope (schema version 1)
+## Ownership boundary
 
-The Overwolf collector in `victoremilianosilva/tft-manager-ow` publishes a
-`TftGepSnapshot` with these fields:
+The Electron/Overwolf repository is the sole GEP interpreter. It merges GEP updates,
+reconciles the baseline, converts GEP feature paths into the canonical state and
+publishes it. Python and C++ validate/consume the canonical contract; they must not
+contain mappings for `me.me.gold`, `board.board_pieces`, `cell_N`, or other GEP paths.
 
-| Field | Meaning | Runtime rule |
-|---|---|---|
-| `schemaVersion` | Snapshot envelope version | Must be integer `1` |
-| `gameId` | GEP game identifier | Positive integer; do not hardcode a guessed ID |
-| `revision` | Monotonic revision within one game session | Reject older revisions; ignore duplicates |
-| `capturedAt` | Collector timestamp | Valid ISO-8601 timestamp |
-| `complete` | Whether baseline reconciliation completed | Inference is blocked until true |
-| `info` | Merged strategic GEP feature tree | Object; field mapping remains schema-driven |
+## Transport schema v2
 
-The collector merges partial `new-info-update` payloads before publishing snapshots.
-The Python boundary must therefore consume the merged snapshot as-is. It must not
-replace the state with a partial delta or independently guess merge semantics.
+Envelope: `schemaVersion=2`, `gameId`, `revision`, `capturedAt`, `complete`,
+and `state`. The state declares `contract="tft.live-state"` and
+`contractVersion=1`.
 
-## Known collector behavior
+Known values use `{known:boolean,value:T|null}`. Unknown values must be null.
+Known empty slots use `{known:true,unit:null}`; unknown slot groups use
+`{known:false,slots:[]}`. This prevents a missing GEP field from being mistaken
+for an empty board or a zero-valued economy field.
 
-The current Overwolf snapshot manager:
-- Reconciles an initial `getInfo` baseline and buffers updates arriving during reconciliation.
-- Publishes a new revision only when strategic state changes.
-- Filters combat telemetry and account/credential identifiers.
-- Redacts augment data because of the collector's display restriction.
-- Marks the snapshot incomplete when the baseline cannot be trusted.
+## Canonical fields
 
-The Python boundary validates the envelope, rejects sensitive keys if they appear,
-and gates inference on a complete baseline. It does not infer game semantics from
-unknown feature names.
+- Stage and round are numeric.
+- Eight player positions are indexed 0–7; names/account identifiers are omitted.
+- `localPlayerIndex` comes from the roster's local-player flag.
+- Roster HP/alive/XP are exposed only when reported.
+- Local player receives gold, level, XP, board (28 slots), bench (9 slots), shop
+  (5 slots), and item-component stacks with counts.
+- Unit items remain attached to units.
+- Carousel item IDs are advisory and not treated as inventory.
+- Opponent boards, bench, shop, gold, and levels remain unknown because the
+  collected source does not provide trustworthy current values for them.
+- Historical match-stat boards are never substituted for current opponent boards.
 
-## Mapping status
+## Runtime guarantees
 
-No production GEP-to-Engine mapping is claimed yet. The actual feature tree and
-native engine state must be compared using a sanitized, real snapshot fixture
-before writing field converters.
+1. Python validates schema, shape, privacy, finite values and revision ordering.
+2. C++ DTO mirrors the canonical fields and validates values; it does not map GEP.
+3. Unknown fields remain unknown. The runtime must not invent opponents or
+   fabricate missing observation inputs.
+4. No `reset()`, `step()`, or test-only setter is used to import a live match.
+5. Recommendations remain read-only and are never sent as TFT game actions.
 
-| Strategic domain | GEP source path | Engine destination | Status |
-|---|---|---|---|
-| Player identity/slot | Not verified | Lobby player index | Pending fixture |
-| Round/stage/phase | Not verified | Engine round/stage | Pending fixture |
-| Health/economy/XP/level | Not verified | Player state | Pending fixture |
-| Board units and positions | Not verified | Board slots | Pending fixture |
-| Bench units | Not verified | Bench slots | Pending fixture |
-| Shop offers | Not verified | Shop slots | Pending fixture |
-| Items/components/anvil | Not verified | Item state | Pending fixture |
-| Traits/composition | Derived or not directly exposed | Observation features | Pending parity audit |
+## Version compatibility
 
-## Safety and correctness invariants
-
-1. Never call `reset()` or `step()` to import a live match; those are simulation APIs.
-2. Never use `*_for_testing` setters as production import APIs.
-3. Never invent missing values. Missing required observation inputs must produce
-   an explicit unavailable result, not a fabricated observation.
-4. Do not pass incomplete, stale, duplicate, malformed, or sensitive snapshots
-   into policy inference.
-5. Keep GEP ingestion read-only. Recommendations are not game actions.
-6. Preserve the original PPO observation layout and checkpoint compatibility;
-   verify with golden observations before enabling live recommendations.
-
-## Current implementation
-
-`live_inference/gep_snapshot.py` validates the versioned envelope, checks
-sensitive-key redaction, enforces a configurable payload-size limit, and tracks
-revision ordering/baseline readiness. It intentionally does not yet build a
-native Engine state.
+Schema v1 carried raw GEP `info` and is intentionally rejected. Overwolf must emit
+schema v2 canonical `state`; a producer/consumer version mismatch fails closed.
