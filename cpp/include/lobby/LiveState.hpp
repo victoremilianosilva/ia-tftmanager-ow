@@ -56,6 +56,7 @@ struct MatchState {
     std::uint64_t game_id{0};\n    std::string session_id;
     std::uint64_t revision{0};
     bool complete{false};
+    Observed<std::string> match_id;
     Observed<std::uint32_t> stage;
     Observed<std::uint32_t> round;
     Observed<std::string> phase;

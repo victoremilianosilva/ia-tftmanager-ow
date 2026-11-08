@@ -20,6 +20,7 @@ for an empty board or a zero-valued economy field.
 
 ## Canonical fields
 
+- Match ID is a canonical string when available and scopes match revisions even while the GEP game ID remains constant.
 - Stage and round are numeric.
 - Eight player positions are indexed 0–7; names/account identifiers are omitted.
 - `localPlayerIndex` comes from the roster's local-player flag.

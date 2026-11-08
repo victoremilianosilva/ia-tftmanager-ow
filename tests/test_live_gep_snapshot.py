@@ -22,6 +22,7 @@ def canonical_state():
     }
     return {
         "contract": "tft.live-state", "contractVersion": 1,
+        "matchId": {"known": True, "value": "778899"},
         "stage": {"known": True, "value": 2}, "round": {"known": True, "value": 6},
         "phase": unknown, "localPlayerIndex": {"known": True, "value": 0},
         "players": [player] + [None] * 7,
@@ -113,7 +114,9 @@ class CanonicalSnapshotTests(unittest.TestCase):
     def test_new_match_session_resets_revision_even_when_gep_game_id_is_constant(self):
         sequence = SnapshotSequence()
         sequence.ingest(snapshot(revision=12))
-        next_match = sequence.ingest(snapshot(sessionId="tft-session-b", revision=1))
+        state = canonical_state()
+        state["matchId"] = {"known": True, "value": "match-456"}
+        next_match = sequence.ingest(snapshot(state=state, revision=1))
         self.assertEqual(next_match.status, "ready")
         self.assertTrue(next_match.ready_for_inference)
 

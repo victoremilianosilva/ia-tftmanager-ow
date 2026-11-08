@@ -114,6 +114,7 @@ def _validate_state(value: Any) -> None:
         raise SnapshotValidationError("state.contract must be 'tft.live-state'")
     if type(state.get("contractVersion")) is not int or state["contractVersion"] != 1:
         raise SnapshotValidationError("unsupported state.contractVersion; expected integer 1")
+    _known(state.get("matchId"), "state.matchId", _text)
     _known(state.get("stage"), "state.stage", _integer)
     _known(state.get("round"), "state.round", _integer)
     _known(state.get("phase"), "state.phase", _text)
@@ -241,8 +242,10 @@ class SnapshotSequence:
 
     def ingest(self, payload: Any) -> SnapshotDecision:
         snapshot = GepSnapshot.parse(payload)
-        if self._game_id != snapshot.game_id or self._session_id != snapshot.session_id:
-            self._game_id, self._session_id, self._revision, self._ready = snapshot.game_id, snapshot.session_id, None, False
+        match = snapshot.state["matchId"]
+        identity = snapshot.session_id + ":" + (match["value"] if match["known"] else "unknown-match")
+        if self._game_id != snapshot.game_id or self._session_id != identity:
+            self._game_id, self._session_id, self._revision, self._ready = snapshot.game_id, identity, None, False
         if self._revision is not None:
             if snapshot.revision < self._revision:
                 return SnapshotDecision("stale", snapshot, False)
