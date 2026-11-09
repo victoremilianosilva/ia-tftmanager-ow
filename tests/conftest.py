@@ -1,6 +1,6 @@
 # Make repository modules importable in pytest on Windows and Python 3.14.
 # Pytest invocation/import mode can leave the repository root off sys.path,
-# causing imports like scripts.strategic_audit_state to fail during collection.
+# Keep test imports isolated from local runtime setup.
 from __future__ import annotations
 
 import sys
