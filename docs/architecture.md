@@ -3,7 +3,7 @@
 ## Visão por camadas
 
 ```text
-trainer.py / scripts de avaliação / viewer
+processo hospedeiro de produção
                 |
         TFTPolicy (PyTorch)
                 |
@@ -26,11 +26,11 @@ O caminho principal de execução passa pela engine nativa. `engine_contracts.py
 
 - **Engine C++ (`cpp/include`, `cpp/src`)**: estado da lobby, ações, economia, loja, unidades, estoque, combate, recompensas, máscaras, validação de movimento e snapshots.
 - **Bindings (`cpp/bindings`, `cpp/src/decision/decision_bindings.cpp`)**: expõem a API nativa para Python.
-- **Adaptadores Python (`cpp_lobby_env.py`, `vector_lobby_env.py`)**: normalizam entradas/saídas, agrupam as oito vagas de cada lobby e conectam a engine ao loop de treino.
-- **Policy/PPO (`policy.py`, `ppo.py`, `rollout.py`)**: escolhem ações autoregressivas com máscaras, calculam objetivos PPO e armazenam transições.
-- **Treinador (`trainer.py`)**: cria ambientes, coleta experiências, executa atualizações e grava checkpoint/métricas.
+- **Adaptador Python (`cpp_lobby_env.py`)**: normaliza entradas/saídas e conecta a engine nativa ao processo de inferência.
+- **Policy (`policy.py`)**: carrega pesos de checkpoints treinados e escolhe ações autoregressivas condicionadas pelas máscaras da engine.
+- **Hospedeiro de runtime**: carrega o checkpoint e chama a policy para cada decisão; não atualiza os pesos.
 - **Viewer (`viewer/`)**: carrega checkpoint para avaliação, chama a engine existente, mostra snapshots e registra sessões; não treina a policy.
-- **Ferramentas (`scripts/`, `tests/`)**: build, avaliação head-to-head, testes de contrato e regressão.
+- **Testes (`tests/`)**: validam engine, bindings, contratos e inferência.
 
 ## Ciclo de uma ação
 
