@@ -283,6 +283,14 @@ endif()
 include(CTest)
 
 if(BUILD_TESTING)
+    add_executable(test_live_state_dto
+        tests/test_live_state_dto.cpp
+        src/lobby/LiveState.cpp
+    )
+    configure_tft_module(test_live_state_dto)
+    enable_tft_test_assertions(test_live_state_dto)
+    add_test(NAME live_state_dto COMMAND test_live_state_dto)
+
     add_executable(test_combat_engine
         tests/test_combat_engine.cpp
         src/combat/CombatEngine.cpp
