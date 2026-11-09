@@ -10,7 +10,7 @@
 
 ## Contexto estratégico
 
-`StrategyInfo` é um snapshot de estratégia para observação e diagnóstico: estratégia atual/anterior, confiança, idade, motivo, scores, poder do tabuleiro, força do banco, contagem de traits ativas e informações de foco/composição. A interface de treino pode registrar contagens de estratégia sem manter uma policy separada por jogador: a policy PPO é compartilhada pelos assentos.
+`StrategyInfo` é um snapshot de estratégia para observação e diagnóstico: estratégia atual/anterior, confiança, idade, motivo, scores, poder do tabuleiro, força do banco, contagem de traits ativas e informações de foco/composição. O processo hospedeiro pode consultar o snapshot de estratégia sem manter uma policy separada por jogador: o mesmo checkpoint é compartilhado pelos oito assentos.
 
 ## Integração
 
