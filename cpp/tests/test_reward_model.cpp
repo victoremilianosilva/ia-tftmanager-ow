@@ -656,7 +656,7 @@ int main() {
                   0.07, "STABILIZE rewards a useful purchase");
     require_close(strategy_action_reward(6, 0, 40, 37, 70.0, 3,
                                          false, false, false, false),
-                  -0.04, "LOSS_STREAK discourages wasteful spending");
+                  0.0, "reserved legacy LOSS_STREAK ID adds no active strategy reward");
     const double econ_xp_below_interest =
         strategy_action_reward(0, 2, 40, 36, 80.0, 4,
                                false, false, false, false);
