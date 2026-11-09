@@ -455,6 +455,12 @@ int main() {
     require_close(strategy_action_reward(1, 1, 55, 53, 90.0, 3,
                                          false, true, false, true),
                   -0.12, "an improved non-SLOWROLL reroll remains costly");
+    require_close(strategy_action_reward(1, 1, 55, 53, 50.0, 3,
+                                         false, true, false, true, 30.0),
+                  -0.12, "an improved STABILIZE reroll does not become positively rewarded");
+    require_close(strategy_action_reward(4, 1, 20, 18, 20.0, 4,
+                                         false, true, false, false),
+                  -0.06, "an improved critical-HP ALL_IN reroll retains its softened opportunity cost");
     require_close(strategy_action_reward(2, 1, 59, 57, 60.0, 5,
                                          false, true, false, true),
                   -0.15, "late rich FAST8 rerolls receive the strongest penalty");
