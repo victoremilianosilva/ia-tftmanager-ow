@@ -1,30 +1,28 @@
-# TFT-like RL Engine
+# TFT-like IA Runtime
 
-Projeto de engine TFT-like em C++ e execução de uma policy PPO compartilhada entre os oito jogadores de cada lobby. A engine de regras é acessada pelo runtime Python via bindings nativos.
+Runtime de produção para executar a policy TFT treinada no repositório principal, usando a engine nativa C++ como fonte de verdade das regras e ações.
 
-## Documentação
+Este repositório **não treina nem faz fine-tuning do modelo**. Ele carrega checkpoints existentes e executa inferência durante a partida.
 
-A documentação técnica está em [docs/README.md](docs/README.md). Ela descreve arquitetura, subsistemas da engine, contrato de ações/máscaras, inferência e build/testes.
+## Build
 
-## Build rápida
-
-No Windows PowerShell, com CMake, compilador C++ e dependências Python instaladas:
+No Windows PowerShell, com Python, CMake e uma toolchain C++ compatível:
 
 ~~~powershell
 python -m pip install -r requirements.txt
 python scripts/build_native.py
 ~~~
 
-Consulte [build e testes](docs/build-and-tests.md) para os pré-requisitos.
+Consulte [build e testes](docs/build-and-tests.md).
 
-## Catálogo de composições OP.GG
+## Componentes
 
-O snapshot local de meta é consumido pela engine C++ como sinal auxiliar para comparar composições conhecidas com o plano nativo, usando snapshots de early/mid game como informação de transição, sem tornar unidades obrigatórias. Veja [docs/opgg-meta-catalog.md](docs/opgg-meta-catalog.md).
+- `cpp/`: engine, regras, bindings e testes nativos.
+- `policy.py`: arquitetura da policy, compatibilidade de checkpoints e inferência.
+- `cpp_lobby_env.py`: adaptador Python para a engine nativa.
+- `engine_contracts.py`: IDs e contratos compartilhados de ações/estratégias.
+- `data/`: catálogos estáticos necessários à execução, incluindo unidades, itens e meta local.
+- `scripts/`: somente utilitários necessários para build e preparação de dados.
+- `tests/`: regressões da engine, bindings, policy e contrato de inferência.
 
-## Componentes principais
-
-- cpp/: engine C++, bindings e testes nativos.
-- policy.py e módulos de inferência: carregamento e execução da policy.
-- cpp_lobby_env.py, vector_lobby_env.py: adaptadores Python do runtime.
-- scripts/: build e utilitários operacionais.
-- tests/: regressões da engine, bindings e contrato de inferência.
+O treinamento PPO, rollout, otimização, fine-tuning, avaliação experimental e auditorias ficam no repositório principal `ia-tft-manager`.
