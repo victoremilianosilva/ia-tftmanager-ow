@@ -8,7 +8,6 @@ on:
       - 'tests/test_board_quality_audit.py'
       - 'tests/test_audit_metric_reconciliation.py'
       - 'scripts/test_audit_viewer_match.py'
-      - 'viewer/player_logs.py'
       - '.github/workflows/audit-script-tests.yml'
   pull_request:
     paths:
@@ -17,8 +16,6 @@ on:
       - 'tests/test_purchase_sequence_audit.py'
       - 'tests/test_board_quality_audit.py'
       - 'scripts/test_audit_viewer_match.py'
-      - 'viewer/audit_window.py'
-      - 'viewer/main.py'
       - '.github/workflows/audit-script-tests.yml'
 
 jobs:
