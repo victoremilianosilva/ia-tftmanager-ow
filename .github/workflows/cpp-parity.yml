@@ -18,10 +18,10 @@ jobs:
           python-version: "3.11"
           cache: pip
 
-      - name: Install test dependencies
-        run: python -m pip install --upgrade pip numpy pytest pybind11 tensorboard "rich>=13.7,<15"
+      - name: Install runtime and test dependencies
+        run: python -m pip install --upgrade pip numpy pytest pybind11
 
-      - name: Install CPU PyTorch for policy integration tests
+      - name: Install CPU PyTorch for policy inference tests
         run: python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
 
       - name: Configure CMake
@@ -40,9 +40,9 @@ jobs:
           ctest --test-dir cpp/build --output-on-failure 2>&1 | tee artifacts/ctest.log
 
       - name: Validate Python runtime syntax
-        run: python -m compileall -q cpp_lobby_env.py engine_contracts.py vector_lobby_env.py policy.py scripts/build_native.py scripts/generate_item_catalog.py
+        run: python -m compileall -q cpp_lobby_env.py engine_contracts.py policy.py scripts/build_native.py scripts/generate_item_catalog.py scripts/migrate_set_data.py scripts/validate_opgg_meta_catalog.py
 
-      - name: Run native engine and policy contract tests
+      - name: Run native engine and policy inference contract tests
         env:
           PYTHONPATH: ${{ github.workspace }}/cpp/build/bin:${{ github.workspace }}
           REQUIRE_CPP_ENGINE: "1"
@@ -67,8 +67,9 @@ jobs:
           tests/test_policy_bench_target_conditioning.py
           tests/test_policy_item_conditioning.py
           tests/test_strategic_policy.py
-          tests/test_evaluate_checkpoints.py
+          tests/test_validate_opgg_meta_catalog.py
           tests/test_generate_item_catalog.py
+          tests/test_migrate_set_data.py
 
       - name: Publish native test reports
         if: always()
