@@ -56,5 +56,5 @@ def test_full_report_handles_empty_decision_timeline():
         "notes": [],
         "decision_timeline": [],
     })
-    assert "Decisões com timeline: 0" in full
+    assert "Decisões únicas estruturadas: 0" in full
     assert "~~~json" not in full
