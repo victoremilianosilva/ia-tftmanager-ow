@@ -1,6 +1,6 @@
 # Documentação técnica
 
-Esta documentação descreve a arquitetura, os contratos e o funcionamento do runtime de produção.
+Documentação da engine C++ e do runtime de inferência.
 
 ## Comece por aqui
 
@@ -10,18 +10,19 @@ Esta documentação descreve a arquitetura, os contratos e o funcionamento do ru
 - [Economia e loja](economy-shop.md) — ouro, XP, juros, reroll e ofertas.
 - [Ações, máscaras e anti-loop](decisions-masks-antiloop.md) — contrato da policy e validação.
 - [Combate](combat.md) — entradas, simulação e eventos.
-- [Recompensas e observações](rewards-observations.md) — contrato de sinais e estado observado.
+- [Recompensas e observações](rewards-observations.md) — sinais e estado observado pela policy.
 - [Estratégia, sinergias e posicionamento](strategy-synergies-positioning.md).
-- [Ambientes Python e bindings](python-environments.md).
+- [Ambiente Python e bindings](python-environments.md).
 - [Build, testes e CI](build-and-tests.md).
 - [Contratos e dados](contracts-and-data.md).
+- [Catálogo de meta](opgg-meta-catalog.md).
 
 ## Princípios
 
 1. A engine C++ é a fonte de verdade para as regras da partida e os resultados das ações.
-2. O runtime Python carrega a policy e faz a inferência; não executa treinamento.
+2. O runtime Python carrega checkpoints treinados e executa inferência; não realiza treinamento nem otimização PPO.
 3. As dimensões de ações, observações e máscaras são contratos entre policy e engine; mudanças precisam ser validadas em conjunto.
-4. Uma funcionalidade descrita aqui não é considerada testada só por estar documentada. Veja os comandos e limitações em [build e testes](build-and-tests.md).
+4. O treinamento, fine-tuning e avaliação experimental pertencem ao repositório principal `ia-tft-manager`.
 
 ## Entradas principais
 
