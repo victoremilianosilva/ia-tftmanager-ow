@@ -4635,7 +4635,8 @@ TFTEngine::Impl::PlayerTransition TFTEngine::Impl::PlayerEnv::step(
             success && reroll_new_best_fit > reroll_old_best_fit,
             success && economy.level > old_level,
             active_strategy_id == 2 || active_strategy_id == 3,
-            lobby.board_power(player_id));
+            lobby.board_power(player_id),
+            useful_shop_purchase_available);
 
         // A policy-specific bonus must not erase the shared economic objective:
         // preserve the path to 50 gold, except when the board is already full
