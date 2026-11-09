@@ -1,8 +1,4 @@
-# Dependências Python do projeto TFT (PPO + PyTorch + TensorBoard)
+# Dependências do runtime de inferência e build nativa
 numpy
 torch
-tensorboard
 pybind11
-PySide6>=6.7,<7
-mcp>=1.9,<2
-rich>=13.7,<15

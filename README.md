@@ -1,52 +1,29 @@
-# TFT-like RL Engine
+# TFT-like IA Runtime
 
-Projeto de ambiente TFT-like para treinamento e avaliação de uma policy PPO compartilhada entre os oito jogadores de cada lobby. A engine de regras é C++ e é acessada por Python via bindings nativos.
+Runtime de produção para executar a policy TFT treinada no repositório principal, usando a engine nativa C++ como fonte de verdade das regras e ações.
 
-## Documentação
+Este repositório **não treina nem faz fine-tuning do modelo**. Ele carrega checkpoints existentes e executa inferência durante a partida.
 
-A documentação técnica está em [docs/README.md](docs/README.md). Ela descreve arquitetura, subsistemas da engine, contrato de ações/máscaras, treinamento, viewer, logs, avaliação e build/testes.
+## Build
 
-## Build rápida
-
-No Windows PowerShell, com CMake, compilador C++ e dependências Python instaladas:
+No Windows PowerShell, com Python, CMake e uma toolchain C++ compatível:
 
 ~~~powershell
 python -m pip install -r requirements.txt
-python scripts/build_native.py
+cmake -S cpp -B cpp/build -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON
+cmake --build cpp/build --config Release --parallel
+ctest --test-dir cpp/build -C Release --output-on-failure
 ~~~
 
-Para o viewer desktop, instale também viewer/requirements.txt e execute:
+Consulte [build e testes](docs/build-and-tests.md).
 
-~~~powershell
-python -m pip install -r viewer/requirements.txt
-python -m viewer.main
-~~~
+## Componentes
 
-Consulte [build e testes](docs/build-and-tests.md) para os pré-requisitos e [viewer](docs/viewer.md) para checkpoints e limitações.
+- `cpp/`: engine, regras, bindings e testes nativos.
+- `policy.py`: arquitetura da policy, compatibilidade de checkpoints e inferência.
+- `cpp_lobby_env.py`: adaptador Python para a engine nativa.
+- `engine_contracts.py`: IDs e contratos compartilhados de ações/estratégias.
+- `data/`: catálogos estáticos necessários à execução, incluindo unidades, itens e meta local.
+- `tests/`: regressões da engine, bindings, policy e contrato de inferência.
 
-## Avaliação unificada da policy
-
-Para gerar um relatório consolidado de auditoria estratégica, ações/recompensas,
-máscaras, ciclos de estado e loops nativos em um único Markdown:
-
-~~~powershell
-python scripts/evaluate_all.py --checkpoint checkpoints/latest.pt --seeds 11,12,13
-~~~
-
-O relatório final é gravado em `reports/evaluation_report.md`; os dados brutos
-JSONL/JSON ficam em `reports/evaluation_data/`. Para comparar dois checkpoints,
-adicione `--baseline checkpoints/base.pt --candidate checkpoints/candidato.pt --matches 20`.
-Para incluir a ablação dos controles de composição, acrescente `--ablation`.
-Essas avaliações opcionais podem executar partidas adicionais e demorar mais.
-
-## Catálogo de composições OP.GG
-
-O treino atualiza o snapshot local de meta antes de iniciar; o Viewer reutiliza o mesmo catálogo e só consulta novamente quando ele está vencido. O C++ compara composições conhecidas com o plano nativo, usando snapshots de early/mid game como informação de transição, sem tornar unidades obrigatórias. Veja [docs/opgg-meta-catalog.md](docs/opgg-meta-catalog.md).
-
-## Componentes principais
-
-- cpp/: engine C++, bindings e testes nativos.
-- trainer.py, policy.py, ppo.py, rollout.py: treinamento PPO.
-- cpp_lobby_env.py, vector_lobby_env.py: adaptadores Python.
-- viewer/: interface de avaliação, sessão, logs e replay.
-- scripts/, tests/: ferramentas e regressões.
+O treinamento PPO, rollout, otimização, fine-tuning, avaliação experimental e auditorias ficam no repositório principal `ia-tft-manager`.

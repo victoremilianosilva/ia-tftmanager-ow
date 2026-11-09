@@ -1,5 +1,4 @@
 name: C++ native engine
-# The same job also compiles and tests the isolated economy_finetuning package.
 
 on:
   push:
@@ -19,10 +18,10 @@ jobs:
           python-version: "3.11"
           cache: pip
 
-      - name: Install test dependencies
-        run: python -m pip install --upgrade pip numpy pytest pybind11 tensorboard "rich>=13.7,<15"
+      - name: Install runtime and test dependencies
+        run: python -m pip install --upgrade pip numpy pytest pybind11
 
-      - name: Install CPU PyTorch for PPO integration tests
+      - name: Install CPU PyTorch for policy inference tests
         run: python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
 
       - name: Configure CMake
@@ -40,10 +39,10 @@ jobs:
           set -o pipefail
           ctest --test-dir cpp/build --output-on-failure 2>&1 | tee artifacts/ctest.log
 
-      - name: Validate Python adapter, PPO, scripts and viewer syntax
-        run: python -m compileall -q cpp_lobby_env.py engine_contracts.py vector_lobby_env.py trainer.py ppo.py policy.py rollout.py scripts/evaluate_checkpoints.py scripts/audit_native_ppo_loops.py scripts/audit_item_system_e2e.py scripts/generate_item_catalog.py viewer tests economy_finetuning
+      - name: Validate Python runtime syntax
+        run: python -m compileall -q cpp_lobby_env.py engine_contracts.py policy.py
 
-      - name: Run native engine integration and PPO contract tests
+      - name: Run native engine and policy inference contract tests
         env:
           PYTHONPATH: ${{ github.workspace }}/cpp/build/bin:${{ github.workspace }}
           REQUIRE_CPP_ENGINE: "1"
@@ -52,7 +51,6 @@ jobs:
           --junitxml=artifacts/native-engine-tests.xml
           tests/test_tft_engine_api.py
           tests/test_native_ppo_loop_regression.py
-          tests/test_native_ppo_loop_audit_helpers.py
           tests/test_lobby_end_to_end.py
           tests/test_full_match_terminal_ranking.py
           tests/test_combat_engine.py
@@ -63,20 +61,9 @@ jobs:
           tests/test_combat_timeout.py
           tests/test_determinismo_combate_cpp.py
           tests/test_integracao_combate_cpp.py
-          tests/test_action_dimensions.py
-          tests/test_action_mask_validation.py
-          tests/test_ppo_mask_consistency.py
           tests/test_policy_bench_target_conditioning.py
           tests/test_policy_item_conditioning.py
           tests/test_strategic_policy.py
-          tests/test_evaluate_checkpoints.py
-          tests/test_audit_item_system_e2e.py
-          tests/test_generate_item_catalog.py
-          tests/test_viewer_policy_diagnostics.py
-          tests/test_viewer_preparation.py
-          tests/test_viewer_player_logs.py
-          tests/test_viewer_item_and_result_logging.py
-          economy_finetuning/tests
 
       - name: Publish native test reports
         if: always()

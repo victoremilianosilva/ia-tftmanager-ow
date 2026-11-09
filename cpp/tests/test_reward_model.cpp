@@ -103,6 +103,22 @@ int main() {
                                          false, false, true, true),
                   0.0,
                   "ECON XP that secures a level-up is not penalized");
+    require_close(strategy_action_reward(0, 2, 60, 56, 80.0, 4,
+                                         false, false, true, false, 40.0),
+                  0.095,
+                  "strong-board ECON converts surplus above 50 into a level-up");
+    require_close(strategy_action_reward(1, 1, 60, 58, 60.0, 4,
+                                         false, true, false, false, 20.0),
+                  -0.15,
+                  "STABILIZE reroll remains costly even when the shop improves");
+    require_close(strategy_action_reward(4, 1, 20, 18, 20.0, 4,
+                                         false, true, false, false),
+                  -0.06,
+                  "ALL_IN critical-HP reroll keeps only the softened opportunity cost");
+    require_close(strategy_action_reward(3, 2, 40, 36, 80.0, 3,
+                                         false, false, true, true),
+                  0.05,
+                  "SLOWROLL may take a controlled level-up while preserving 30 gold");
     const double neutral_xp = xp_level_transition_value(60, 56, 80.0, 4, 7, 8, 0.0, 0);
     const double stabilize_xp = xp_level_transition_value(60, 56, 80.0, 4, 7, 8, 0.0, 1);
     const double slowroll_xp = xp_level_transition_value(60, 56, 80.0, 4, 7, 8, 0.0, 3);
@@ -439,6 +455,12 @@ int main() {
     require_close(strategy_action_reward(1, 1, 55, 53, 90.0, 3,
                                          false, true, false, true),
                   -0.12, "an improved non-SLOWROLL reroll remains costly");
+    require_close(strategy_action_reward(1, 1, 55, 53, 50.0, 3,
+                                         false, true, false, true, 30.0),
+                  -0.12, "an improved STABILIZE reroll does not become positively rewarded");
+    require_close(strategy_action_reward(4, 1, 20, 18, 20.0, 4,
+                                         false, true, false, false),
+                  -0.06, "an improved critical-HP ALL_IN reroll retains its softened opportunity cost");
     require_close(strategy_action_reward(2, 1, 59, 57, 60.0, 5,
                                          false, true, false, true),
                   -0.15, "late rich FAST8 rerolls receive the strongest penalty");
@@ -634,7 +656,7 @@ int main() {
                   0.07, "STABILIZE rewards a useful purchase");
     require_close(strategy_action_reward(6, 0, 40, 37, 70.0, 3,
                                          false, false, false, false),
-                  -0.04, "LOSS_STREAK discourages wasteful spending");
+                  0.0, "reserved legacy LOSS_STREAK ID adds no active strategy reward");
     const double econ_xp_below_interest =
         strategy_action_reward(0, 2, 40, 36, 80.0, 4,
                                false, false, false, false);

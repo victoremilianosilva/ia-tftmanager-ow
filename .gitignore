@@ -1,36 +1,29 @@
-# ============================================================
 # Python
-# ============================================================
-
 __pycache__/
 *.py[cod]
 *$py.class
-
-# Virtual environments
 .venv/
 venv/
 env/
 ENV/
-.env/
 .python-version
 
-# Distribution / packaging
+# Packaging and native build outputs
 build/
 dist/
 *.egg-info/
 .eggs/
+cpp/build/
+*.so
+*.pyd
+*.dll
+*.dylib
 
-# ============================================================
 # IDEs
-# ============================================================
-
 .vscode/
 .idea/
 
-# ============================================================
-# Testes / Coverage
-# ============================================================
-
+# Tests
 .pytest_cache/
 .coverage
 .coverage.*
@@ -38,85 +31,38 @@ htmlcov/
 .tox/
 .nox/
 
-# ============================================================
-# Logs
-# ============================================================
-
+# Local runtime logs and reports
 *.log
 logs/
+tft_logs/
+tensorboard/
+reports/
+artifacts/
 
-# ============================================================
-# Jupyter
-# ============================================================
-
-.ipynb_checkpoints/
-
-# ============================================================
-# Machine Learning / Training
-# ============================================================
-
+# Local checkpoints supplied to the inference runtime
 checkpoints/
 models/
-tensorboard/
-wandb/
-
 *.pth
 *.pt
 *.ckpt
 
-# ============================================================
-# OS
-# ============================================================
+# Jupyter
+.ipynb_checkpoints/
 
-# Windows
+# OS
 Thumbs.db
 Desktop.ini
-
-# macOS
 .DS_Store
-
-# Linux
 *~
 
-# ============================================================
 # Local configuration / secrets
-# ============================================================
-
 .env
 .env.*
 !.env.example
 
-# ============================================================
 # Temporary files
-# ============================================================
-
 *.tmp
 *.temp
 *.bak
 *.swp
 *.swo
-
-# ============================================================
-# Logs estruturados de partidas / auditoria (gerados localmente)
-# ============================================================
-
-# Relatório JSON gerado pela auditoria offline
-audit_report.json
-
-# Sidecars JSON individuais dos jogadores gerados pelo Viewer
-player_*_log.json
-
-# ============================================================
-# Fine-tuning econômico independente (artefatos locais)
-# ============================================================
-
-# JSONL de treinamento, cenários, traces e auditorias: potencialmente enormes
-*.jsonl
-**/*.jsonl
-
-# Execuções locais do fine-tuning e TensorBoard
-economy_finetuning/checkpoints/
-economy_finetuning/tensorboard/
-
-# Local approval/lineage state for sequential fine-tuning
-economy_finetuning/chain_state.json

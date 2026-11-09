@@ -115,12 +115,16 @@ inline double strategy_action_reward(
     bool useful_purchase,
     bool reroll_improved,
     bool leveled,
-    bool has_composition_target) noexcept {
+    bool has_composition_target,
+    double board_power = 0.0,
+    bool useful_shop_purchase_available = false) noexcept {
     // Do not mask rerolls: the policy must learn their opportunity cost.
     // Every strategy except SLOWROLL receives a context-sensitive penalty.
     // The penalty grows with surplus liquidity and match progression, while
     // critical HP softens (but never removes) the cost of an emergency roll.
     if (action_type == 1 && strategy_id != 3) {
+        // STABILIZE may roll when a pressured board finds a materially better
+        // shop. ALL_IN may do the same at critical HP; neither action is masked.
         double penalty = stage >= 4 && old_gold >= 50 ? 0.15
             : (stage >= 3 || old_gold >= 40 ? 0.12 : 0.09);
         if (hp <= 25.0) penalty = std::min(penalty, 0.06);
@@ -135,6 +139,11 @@ inline double strategy_action_reward(
                 reward += 0.05;
             if (old_gold >= 50 && action_type == 2 && new_gold < old_gold)
                 reward += 0.025;
+            // ECON keeps the interest reserve, then converts true surplus into
+            // XP while its strong-board eligibility is active.
+            if (board_power >= 35.0 && !useful_shop_purchase_available &&
+                old_gold > 50 && action_type == 2 && new_gold >= 50)
+                reward += leveled ? 0.07 : 0.025;
             if (new_gold < 50 && new_gold < old_gold && hp > 40.0) {
                 // A comp target can justify buying units, not routine XP that
                 // fails to reach a level. Keep the purchase-specific exception.
@@ -163,6 +172,10 @@ inline double strategy_action_reward(
             // later stages, level-ups, and the 50-gold reserve remain exempt.
             if (action_type == 2 && !leveled && stage <= 3 &&
                 hp > 50.0 && old_gold < 50) reward -= 0.04;
+            // A controlled level-up is compatible with a winning slowroll line
+            // when enough liquidity remains to keep buying target copies.
+            if (action_type == 2 && leveled && old_gold >= 30 && new_gold >= 30)
+                reward += 0.05;
             break;
         case 4: // ALL_IN: convert remaining gold into immediate board strength.
             if (action_type == 0 && useful_purchase) reward += 0.10;
@@ -174,10 +187,7 @@ inline double strategy_action_reward(
             if (action_type == 0 && useful_purchase) reward += 0.05;
             if (action_type == 2 && leveled) reward += 0.04;
             break;
-        case 6: // LOSS_STREAK: preserve the streak only while purchases are not useful.
-            if (hp >= 50.0 && !useful_purchase &&
-                (action_type == 0 || action_type == 1 || action_type == 2))
-                reward -= 0.04;
+        case 6: // Reserved legacy ID; LOSS_STREAK is no longer trained or selected.
             break;
         default:
             break;

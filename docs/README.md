@@ -1,6 +1,6 @@
 # Documentação técnica
 
-Esta documentação descreve o código presente no repositório, separando arquitetura, contratos e funcionalidades. Os diagramas do viewer foram movidos para [assets](assets/).
+Documentação da engine C++ e do runtime de inferência.
 
 ## Comece por aqui
 
@@ -10,30 +10,22 @@ Esta documentação descreve o código presente no repositório, separando arqui
 - [Economia e loja](economy-shop.md) — ouro, XP, juros, reroll e ofertas.
 - [Ações, máscaras e anti-loop](decisions-masks-antiloop.md) — contrato da policy e validação.
 - [Combate](combat.md) — entradas, simulação e eventos.
-- [Recompensas e observações](rewards-observations.md) — sinais de treino e estado observado.
+- [Recompensas e observações](rewards-observations.md) — sinais e estado observado pela policy.
 - [Estratégia, sinergias e posicionamento](strategy-synergies-positioning.md).
-- [Treinamento PPO](rl-training.md) — coleta, rollout, otimização e checkpoints.
-- [Ambientes Python e bindings](python-environments.md).
-- [Viewer desktop](viewer.md) — interface de avaliação e limites reais.
-- [Logs, sessões e replay](sessions-logs-replay.md).
-- [Avaliação e ferramentas](evaluation-tooling.md).
+- [Ambiente Python e bindings](python-environments.md).
 - [Build, testes e CI](build-and-tests.md).
 - [Contratos e dados](contracts-and-data.md).
+- [Catálogo de meta](opgg-meta-catalog.md).
 
-## Princípios usados nesta documentação
+## Princípios
 
 1. A engine C++ é a fonte de verdade para as regras da partida e os resultados das ações.
-2. Python/PyTorch controla treinamento, coleta de experiências, inferência e ferramentas de avaliação.
+2. O runtime Python carrega checkpoints treinados e executa inferência; não realiza treinamento nem otimização PPO.
 3. As dimensões de ações, observações e máscaras são contratos entre policy e engine; mudanças precisam ser validadas em conjunto.
-4. Diagramas de interface são wireframes, não evidência de que todos os dados ilustrados já são fornecidos pela engine.
-5. Uma funcionalidade descrita aqui não é considerada testada só por estar documentada. Veja os comandos e limitações em [build e testes](build-and-tests.md).
+4. O treinamento, fine-tuning e avaliação experimental pertencem ao repositório principal `ia-tft-manager`.
 
 ## Entradas principais
 
-- Treinamento: `trainer.py`
 - Policy: `policy.py`
-- PPO: `ppo.py`
-- Buffer: `rollout.py`
 - Adaptador nativo: `cpp_lobby_env.py`
 - Engine: `cpp/include/lobby/TftEngine.hpp` e implementações em `cpp/src/`
-- Viewer: `viewer/main.py`, `viewer/session.py` e `viewer/player_logs.py`

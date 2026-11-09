@@ -1,1 +1,0 @@
-"""TFT desktop viewer package."""

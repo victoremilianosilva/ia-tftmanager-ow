@@ -93,8 +93,16 @@ int main() {
     s.composition_requests_three_star = false;
     s.loss_streak = 4; s.win_streak = 0;
     d = select_economic_strategy(s);
-    require(d.selected == EconomicStrategy::LossStreak,
-            "loss streak is eligible only in a healthy, low-power economy state");
+    require(d.selected == EconomicStrategy::Econ,
+            "LOSS_STREAK is retired; ECON handles low-spend states");
+
+    // FAST8 must not start from a weak board even with a composition goal.
+    s.composition_requests_fast8 = true;
+    s.board_power = 30; s.gold = 60; s.level = 6; s.stage = 4;
+    d = select_economic_strategy(s);
+    require(d.selected != EconomicStrategy::Fast8,
+            "FAST8 requires a strong board before leveling toward eight");
+    s.composition_requests_fast8 = false;
 
     s.loss_streak = 0; s.win_streak = 4; s.board_power = 45;
     d = select_economic_strategy(s);
