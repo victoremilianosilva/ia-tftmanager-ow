@@ -5,14 +5,13 @@
 - Python e dependências de requirements.txt.
 - CMake e toolchain C++ compatíveis com a plataforma.
 - pybind11 instalado no mesmo interpretador Python usado na build.
-- PySide6 para o viewer, listado em viewer/requirements.txt.
 
 ## Build recomendada
 
 Na raiz do repositório:
 
 ~~~powershell
-python -m pip install -r requirements.txt -r viewer/requirements.txt
+python -m pip install -r requirements.txt
 python scripts/build_native.py
 ~~~
 
@@ -26,11 +25,11 @@ Com o módulo nativo compilado e disponível no caminho de importação:
 python -m pytest tests
 ~~~
 
-Para triagem, selecione testes relevantes como tests/test_viewer_player_logs.py, tests/test_viewer_policy_diagnostics.py, tests/test_action_dimensions.py ou tests/test_lobby_end_to_end.py.
+Para triagem, selecione testes relevantes como tests/test_action_dimensions.py ou tests/test_lobby_end_to_end.py.
 
 ## CI
 
-.github/workflows/cpp-parity.yml cobre a trilha de paridade C++ configurada no workflow. Não assuma que ele executa todos os testes Python ou inicia o viewer; confira os passos efetivos ao alterar cobertura.
+.github/workflows/cpp-parity.yml cobre a trilha de paridade C++ configurada no workflow. Não assuma que ele executa todos os testes Python; confira os passos efetivos ao alterar cobertura.
 
 ## Critérios de conclusão
 

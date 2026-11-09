@@ -4,15 +4,11 @@ on:
   push:
     paths:
       - 'scripts/audit_viewer_match.py'
-      - 'viewer/player_logs.py'
       - 'tests/test_purchase_sequence_audit.py'
       - 'tests/test_board_quality_audit.py'
       - 'tests/test_audit_metric_reconciliation.py'
       - 'scripts/test_audit_viewer_match.py'
-      - 'viewer/audit_window.py'
       - 'viewer/player_logs.py'
-      - 'viewer/session.py'
-      - 'viewer/main.py'
       - '.github/workflows/audit-script-tests.yml'
   pull_request:
     paths:
@@ -34,7 +30,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Compile Python
-        run: python -m py_compile scripts/audit_viewer_match.py scripts/test_audit_viewer_match.py viewer/audit_window.py viewer/main.py viewer/player_logs.py viewer/session.py
+        run: python -m py_compile scripts/audit_viewer_match.py scripts/test_audit_viewer_match.py
       - name: Install pytest for audit unit tests
         run: python -m pip install pytest
       - name: Run audit regression tests

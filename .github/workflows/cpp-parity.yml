@@ -39,8 +39,8 @@ jobs:
           set -o pipefail
           ctest --test-dir cpp/build --output-on-failure 2>&1 | tee artifacts/ctest.log
 
-      - name: Validate Python adapter, PPO, scripts and viewer syntax
-        run: python -m compileall -q cpp_lobby_env.py engine_contracts.py vector_lobby_env.py trainer.py ppo.py policy.py rollout.py scripts/evaluate_checkpoints.py scripts/audit_native_ppo_loops.py scripts/audit_item_system_e2e.py scripts/generate_item_catalog.py viewer tests
+      - name: Validate Python adapter, PPO and scripts
+        run: python -m compileall -q cpp_lobby_env.py engine_contracts.py vector_lobby_env.py trainer.py ppo.py policy.py rollout.py scripts/evaluate_checkpoints.py scripts/audit_native_ppo_loops.py scripts/audit_item_system_e2e.py scripts/generate_item_catalog.py tests
 
       - name: Run native engine integration and PPO contract tests
         env:
@@ -71,10 +71,6 @@ jobs:
           tests/test_evaluate_checkpoints.py
           tests/test_audit_item_system_e2e.py
           tests/test_generate_item_catalog.py
-          tests/test_viewer_policy_diagnostics.py
-          tests/test_viewer_preparation.py
-          tests/test_viewer_player_logs.py
-          tests/test_viewer_item_and_result_logging.py
 
       - name: Publish native test reports
         if: always()
