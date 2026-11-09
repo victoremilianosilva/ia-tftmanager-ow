@@ -141,7 +141,8 @@ inline double strategy_action_reward(
                 reward += 0.025;
             // ECON keeps the interest reserve, then converts true surplus into
             // XP while its strong-board eligibility is active.
-            if (board_power >= 35.0 && old_gold > 50 && action_type == 2 && new_gold >= 50)
+            if (board_power >= 35.0 && !useful_shop_purchase_available &&
+                old_gold > 50 && action_type == 2 && new_gold >= 50)
                 reward += leveled ? 0.07 : 0.025;
             if (new_gold < 50 && new_gold < old_gold && hp > 40.0) {
                 // A comp target can justify buying units, not routine XP that
