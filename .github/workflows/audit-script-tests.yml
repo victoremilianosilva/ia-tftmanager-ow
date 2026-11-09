@@ -14,7 +14,6 @@ on:
       - 'tests/test_audit_metric_reconciliation.py'
       - 'tests/test_purchase_sequence_audit.py'
       - 'tests/test_board_quality_audit.py'
-      - 'scripts/test_audit_viewer_match.py'
       - '.github/workflows/audit-script-tests.yml'
 
 jobs:
