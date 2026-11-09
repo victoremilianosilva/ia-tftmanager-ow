@@ -109,12 +109,12 @@ int main() {
                   "strong-board ECON converts surplus above 50 into a level-up");
     require_close(strategy_action_reward(1, 1, 60, 58, 60.0, 4,
                                          false, true, false, false, 20.0),
-                  0.04,
-                  "STABILIZE may reroll when a pressured board finds a better shop");
+                  -0.15,
+                  "STABILIZE reroll remains costly even when the shop improves");
     require_close(strategy_action_reward(4, 1, 20, 18, 20.0, 4,
                                          false, true, false, false),
-                  0.04,
-                  "ALL_IN may reroll when a critical-HP shop improves");
+                  -0.06,
+                  "ALL_IN critical-HP reroll keeps only the softened opportunity cost");
     require_close(strategy_action_reward(3, 2, 40, 36, 80.0, 3,
                                          false, false, true, true),
                   0.05,
