@@ -115,7 +115,9 @@ inline double strategy_action_reward(
     bool useful_purchase,
     bool reroll_improved,
     bool leveled,
-    bool has_composition_target) noexcept {
+    bool has_composition_target,
+    double board_power = 0.0,
+    bool useful_shop_purchase_available = false) noexcept {
     // Do not mask rerolls: the policy must learn their opportunity cost.
     // Every strategy except SLOWROLL receives a context-sensitive penalty.
     // The penalty grows with surplus liquidity and match progression, while
