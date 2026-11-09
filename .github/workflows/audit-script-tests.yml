@@ -5,6 +5,7 @@ on:
     paths:
       - 'scripts/audit_viewer_match.py'
       - 'tests/test_purchase_sequence_audit.py'
+      - 'tests/test_audit_full_report.py'
       - 'tests/test_board_quality_audit.py'
       - 'tests/test_audit_metric_reconciliation.py'
       - '.github/workflows/audit-script-tests.yml'
