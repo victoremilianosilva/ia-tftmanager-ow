@@ -125,8 +125,6 @@ inline double strategy_action_reward(
     if (action_type == 1 && strategy_id != 3) {
         // STABILIZE may roll when a pressured board finds a materially better
         // shop. ALL_IN may do the same at critical HP; neither action is masked.
-        if (strategy_id == 1 && board_power < 35.0 && hp > 25.0 && hp <= 65.0 && reroll_improved) return 0.04;
-        if (strategy_id == 4 && hp <= 25.0 && reroll_improved) return 0.04;
         double penalty = stage >= 4 && old_gold >= 50 ? 0.15
             : (stage >= 3 || old_gold >= 40 ? 0.12 : 0.09);
         if (hp <= 25.0) penalty = std::min(penalty, 0.06);
