@@ -13,7 +13,7 @@ enum class EconomicStrategy : std::int32_t {
     Slowroll = 3,
     AllIn = 4,
     WinStreak = 5,
-    LossStreak = 6
+    LossStreak = 6 // Reserved legacy slot; no longer selected.
 };
 
 struct EconomicStrategyContext {
@@ -47,7 +47,7 @@ inline EconomicStrategyDecision select_economic_strategy(
         out.reason = "HP crítico: gastar para sobreviver";
     }
 
-    if (s.hp <= 38.0 || (s.board_power < 25.0 && s.hp < 65.0)) {
+    if (s.hp <= 38.0 || (s.board_power < 35.0 && s.hp < 65.0)) {
         out.scores[1] = 65.0 + std::max(0.0, 38.0 - s.hp) * 0.25
             + std::max(0.0, 25.0 - s.board_power) * 0.15;
         if (s.hp <= 25.0) out.scores[1] = kIneligible;
@@ -94,20 +94,14 @@ inline EconomicStrategyDecision select_economic_strategy(
     // Fast 8 is only enabled when the active composition plan calls for at
     // least eight units; gold alone must never select this strategy.
     if (s.composition_requests_fast8 && s.level >= 6 && s.level < 8 &&
-        s.hp > 38.0 && s.board_power >= 25.0) {
+        s.hp > 38.0 && s.board_power >= 35.0) {
         out.scores[2] = 76.0 + std::min(s.gold, 50) * 0.04
             + (s.level >= 7 ? 3.0 : 0.0)
             + (s.stage >= 5 ? 2.0 : 0.0);
         out.reason = "FAST8: composição planejada exige nível 8";
     }
 
-    // A deliberate loss streak is only an option while healthy enough to
-    // survive it and when no composition-directed spend has priority.
-    if (!has_comp_goal && s.loss_streak >= 3 && s.hp >= 50.0 &&
-        s.gold < 50 && s.board_power < 40.0) {
-        out.scores[6] = 49.0 + std::min(s.loss_streak, 6) * 1.2;
-        out.reason = "LOSS_STREAK: converter derrota em economia sem risco crítico";
-    }
+    // LOSS_STREAK was retired: ECON already covers deliberate low-spend states.
 
     // ECON means protecting the interest threshold, not hoarding forever.
     // At/above 50 gold it remains eligible as a reserve policy, but reward
@@ -165,7 +159,7 @@ inline EconomicStrategyDecision select_economic_strategy(
             out.reason = "WINSTREAK: preservar vantagem atual";
             break;
         case EconomicStrategy::LossStreak:
-            out.reason = "LOSS_STREAK: converter derrota em economia sem risco crítico";
+            out.reason = "LOSS_STREAK: estratégia aposentada";
             break;
     }
     double second = kIneligible;
