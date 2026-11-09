@@ -10,7 +10,9 @@ No Windows PowerShell, com Python, CMake e uma toolchain C++ compatível:
 
 ~~~powershell
 python -m pip install -r requirements.txt
-python scripts/build_native.py
+cmake -S cpp -B cpp/build -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON
+cmake --build cpp/build --config Release --parallel
+ctest --test-dir cpp/build -C Release --output-on-failure
 ~~~
 
 Consulte [build e testes](docs/build-and-tests.md).
@@ -22,7 +24,6 @@ Consulte [build e testes](docs/build-and-tests.md).
 - `cpp_lobby_env.py`: adaptador Python para a engine nativa.
 - `engine_contracts.py`: IDs e contratos compartilhados de ações/estratégias.
 - `data/`: catálogos estáticos necessários à execução, incluindo unidades, itens e meta local.
-- `scripts/`: somente utilitários necessários para build e preparação de dados.
 - `tests/`: regressões da engine, bindings, policy e contrato de inferência.
 
 O treinamento PPO, rollout, otimização, fine-tuning, avaliação experimental e auditorias ficam no repositório principal `ia-tft-manager`.
