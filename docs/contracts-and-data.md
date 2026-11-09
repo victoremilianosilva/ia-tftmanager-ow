@@ -15,7 +15,7 @@ engine_contracts.py mantém IDs Python estáveis para tipos de ação e estraté
 
 ## Máscaras
 
-As máscaras booleanas chegam ao PyTorch e são armazenadas no rollout junto com as transições. Matrizes condicionais representam origem × destino, e o tipo da ação determina quais componentes têm significado. Policy e engine precisam compartilhar a mesma convenção de índices.
+As máscaras booleanas produzidas pela engine chegam ao PyTorch durante a inferência. Matrizes condicionais representam origem × destino, e o tipo da ação determina quais componentes têm significado. Policy e engine precisam compartilhar a mesma convenção de índices.
 
 ## Catálogo de unidades
 
@@ -29,7 +29,7 @@ O schema de sessão atual é versão 1. metadata.json guarda metadados da partid
 
 1. Mude o tipo/shape na definição de origem.
 2. Atualize binding e wrapper.
-3. Atualize policy, flattening e armazenamento do rollout.
+3. Atualize a policy e os adaptadores de observação/inferência; o contrato deve continuar alinhado com as dimensões nativas.
 4. Adicione fixtures de equivalência e casos inválidos.
 5. Atualize esta documentação e os documentos funcionais afetados.
 6. Execute CTest e testes Python relacionados.
