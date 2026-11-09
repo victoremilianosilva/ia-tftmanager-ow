@@ -103,6 +103,22 @@ int main() {
                                          false, false, true, true),
                   0.0,
                   "ECON XP that secures a level-up is not penalized");
+    require_close(strategy_action_reward(0, 2, 60, 56, 80.0, 4,
+                                         false, false, true, false, 40.0),
+                  0.095,
+                  "strong-board ECON converts surplus above 50 into a level-up");
+    require_close(strategy_action_reward(1, 1, 60, 58, 60.0, 4,
+                                         false, true, false, false, 20.0),
+                  0.04,
+                  "STABILIZE may reroll when a pressured board finds a better shop");
+    require_close(strategy_action_reward(4, 1, 20, 18, 20.0, 4,
+                                         false, true, false, false),
+                  0.04,
+                  "ALL_IN may reroll when a critical-HP shop improves");
+    require_close(strategy_action_reward(3, 2, 40, 36, 80.0, 3,
+                                         false, false, true, true),
+                  0.05,
+                  "SLOWROLL may take a controlled level-up while preserving 30 gold");
     const double neutral_xp = xp_level_transition_value(60, 56, 80.0, 4, 7, 8, 0.0, 0);
     const double stabilize_xp = xp_level_transition_value(60, 56, 80.0, 4, 7, 8, 0.0, 1);
     const double slowroll_xp = xp_level_transition_value(60, 56, 80.0, 4, 7, 8, 0.0, 3);
