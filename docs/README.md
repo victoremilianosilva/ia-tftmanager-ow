@@ -17,15 +17,24 @@ Documentação da engine C++ e do runtime de inferência.
 - [Contratos e dados](contracts-and-data.md).
 - [Catálogo de meta](opgg-meta-catalog.md).
 
+## Integração live Overwolf
+
+- [Mapeamento e contrato GEP canônico](GEP_MAPPING.md) — schema v2 e ownership de interpretação.
+- [Auditoria de importação nativa](NATIVE_ENGINE_LIVE_IMPORT_AUDIT.md) — DTO atual, lacunas de importer e requisitos antes de observações live.
+
 ## Princípios
 
 1. A engine C++ é a fonte de verdade para as regras da partida e os resultados das ações.
 2. O runtime Python carrega checkpoints treinados e executa inferência; não realiza treinamento nem otimização PPO.
 3. As dimensões de ações, observações e máscaras são contratos entre policy e engine; mudanças precisam ser validadas em conjunto.
 4. O treinamento, fine-tuning e avaliação experimental pertencem ao repositório principal `ia-tft-manager`.
+5. Snapshot canônico validado não equivale a estado importado na Engine nem a inferência live disponível.
 
 ## Entradas principais
 
 - Policy: `policy.py`
+- Runner read-only: `live_inference/policy_runner.py`
+- Receiver de snapshot: `live_inference/service.py`
 - Adaptador nativo: `cpp_lobby_env.py`
+- DTO live (validação somente): `cpp/include/lobby/LiveState.hpp`
 - Engine: `cpp/include/lobby/TftEngine.hpp` e implementações em `cpp/src/`
